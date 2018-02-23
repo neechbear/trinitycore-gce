@@ -1,2 +1,6 @@
-worlserver.conf
-authserver.conf
+*.conf
+*.dist
+serverconf.sh
+*.mk
+*.key
+*secret*
