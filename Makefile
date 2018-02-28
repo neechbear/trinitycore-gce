@@ -7,7 +7,6 @@ PROJECT_ID :=
 ZONE := europe-west1-d
 MACHINE_TYPE := n1-standard-2
 
-CONF_SH := serverconf.sh
 CONF_JSON := serverconf.json
 ifneq ("$(wildcard serverconf-secret.json)","")
   CONF_JSON := serverconf-secret.json
@@ -28,6 +27,8 @@ BOOT_DISK_SIZE := 20GB
 
 ADMIN_RANGES := 127.0.0.1
 
+CONF_SED_ARGS := $(shell jq -r 'to_entries|map("-e '"'"'s/^\(.key)\\s*=.*/\(.key) = \"\(.value|tostring)\"/'"'"'")|join(" ")' $(CONF_JSON))
+
 -include secret.mk
 
 .PHONY: create destroy clean firewall update-metadata conf conf-dist
@@ -42,18 +43,14 @@ __check_defined = \
 
 conf: $(CONF_FILES)
 
-conf-dist: $(addsuffix .dist,$(CONF_FILES))
-
-$(CONF_FILES): $(CONF_SH)
 %.conf: %.conf.in
-	env -i bash -c 'source $(CONF_SH) && envsubst < $<' \
-		| sed -e 's/^#.*$$//' -e '/^$$/d' -e 's/^\([A-Za-z0-9\.]*\)\s*=\s*/\1 = /' > $@
+	sed $(CONF_SED_ARGS) $< \
+	  | sed -e 's/^#.*$$//' -e '/^$$/d' -e 's/^\([A-Za-z0-9\.]*\)\s*=\s*/\1 = /' > $@
+
+conf-dist: $(addsuffix .dist,$(CONF_FILES))
 
 %.conf.dist:
 	curl -o $@ $(TC_GIT_SRC_URL)/src/server/$(patsubst %.conf.dist,%,$@)/$@
-
-$(CONF_SH): $(CONF_JSON)
-	jq -r 'to_entries|map("export \(.key)=\"\(.value|tostring)\"")|.[]' $< > $@
 
 $(MAPDATA_KEY):
 	@:$(call check_defined, PROJECT_ID, Google Cloud project ID)
@@ -124,5 +121,5 @@ firewall:
 	gcloud compute firewall-rules list --project $(PROJECT_ID)
 
 clean:
-	$(RM) $(CONF_SH) $(CONF_FILES) $(addsuffix .dist,$(CONF_FILES))
+	$(RM) $(CONF_FILES) $(addsuffix .dist,$(CONF_FILES))
 
