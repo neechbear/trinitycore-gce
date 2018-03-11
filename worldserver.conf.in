@@ -2155,7 +2155,7 @@ Visibility.GroupMode = 1
 #                     170 - (Visibility.Distance.Instances)
 #                     533 - (Visibility.Distance.BGArenas)
 
-Visibility.Distance.Continents = 170
+Visibility.Distance.Continents = 300
 Visibility.Distance.Instances = 170
 Visibility.Distance.BGArenas = 533
 
