@@ -31,15 +31,18 @@ CONF_SED_ARGS := $(shell jq -r 'to_entries|map("-e '"'"'s/^\(.key)\\s*=.*/\(.key
 
 -include secret.mk
 
-.PHONY: create destroy clean firewall update-metadata conf conf-dist
+.PHONY: create destroy clean firewall metadata help
 
-check_defined = \
-    $(strip $(foreach 1,$1, \
-        $(call __check_defined,$1,$(strip $(value 2)))))
-__check_defined = \
-    $(if $(value $1),, \
-        $(error Undefined $1$(if $2, ($2))$(if $(value @), \
-                required by target `$@')))
+help:
+	@echo "Available targets:"
+	@echo "  make help"
+	@echo "  make conf"
+	@echo "  make distconf"
+	@echo "  make create PROJECT_ID=yourid INSTSANCE_NAME=vmname MAPDATA_BUCKET=bucketname"
+	@echo "  make destroy PROJECT_ID=yourid INSTANCE_NAME=vmname"
+	@echo "  make firewall PROJECT_ID=yourid ADMIN_RANGES=trustedcidr"
+	@echo "  make metadata PROJECT_ID=yourid INSTANCE_NAME=vmname MAPDATA_BUCKET=bucketname"
+	@echo "  make clean"
 
 conf: $(CONF_FILES)
 
@@ -47,7 +50,7 @@ conf: $(CONF_FILES)
 	sed $(CONF_SED_ARGS) $< \
 	  | sed -e 's/^#.*$$//' -e '/^$$/d' -e 's/^\([A-Za-z0-9\.]*\)\s*=\s*/\1 = /' > $@
 
-conf-dist: $(addsuffix .dist,$(CONF_FILES))
+distconf: $(addsuffix .dist,$(CONF_FILES))
 
 %.conf.dist:
 	curl -o $@ $(TC_GIT_SRC_URL)/src/server/$(patsubst %.conf.dist,%,$@)/$@
@@ -65,7 +68,7 @@ $(MAPDATA_KEY):
 		--member "serviceAccount:$(MAPDATA_KEY_NAME)@$(PROJECT_ID).iam.gserviceaccount.com" \
 		--role "roles/storage.objectViewer"
 
-create: $(AUTH_CONF) $(WORLD_CONF) $(MAPDATA_KEY)
+create: $(CONF_FILES) $(MAPDATA_KEY)
 	@:$(call check_defined, PROJECT_ID, Google Cloud project ID)
 	@:$(call check_defined, INSTANCE_NAME, Google Cloud compute instance VM name)
 	@:$(call check_defined, MAPDATA_BUCKET, Google Cloud storage bucket name containing Data/*.MPQ files)
@@ -80,7 +83,7 @@ create: $(AUTH_CONF) $(WORLD_CONF) $(MAPDATA_KEY)
 		--metadata mapdata-bucket=$(MAPDATA_BUCKET) \
 		--metadata-from-file startup-script=startup-script.sh,worldserver-conf=$(WORLD_CONF),authserver-conf=$(AUTH_CONF),mapdata-key=$(MAPDATA_KEY)
 
-update-metadata: $(AUTH_CONF) $(WORLD_CONF) $(MAPDATA_KEY)
+metadata: $(AUTH_CONF) $(WORLD_CONF) $(MAPDATA_KEY)
 	@:$(call check_defined, PROJECT_ID, Google Cloud project ID)
 	@:$(call check_defined, INSTANCE_NAME, Google Cloud compute instance VM name)
 	@:$(call check_defined, MAPDATA_BUCKET, Google Cloud storage bucket name containing Data/*.MPQ files)
@@ -122,4 +125,12 @@ firewall:
 
 clean:
 	$(RM) $(CONF_FILES) $(addsuffix .dist,$(CONF_FILES))
+
+check_defined = \
+    $(strip $(foreach 1,$1, \
+        $(call __check_defined,$1,$(strip $(value 2)))))
+__check_defined = \
+    $(if $(value $1),, \
+        $(error Undefined $1$(if $2, ($2))$(if $(value @), \
+                required by target `$@')))
 
