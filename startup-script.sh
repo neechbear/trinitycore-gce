@@ -169,9 +169,9 @@ main () {
   fi
 
   # Pull the latest source.
-  git checkout 3.3.5
-  git fetch --all
-  git reset --hard origin/3.3.5
+  git -C ~trinity/TrinityCore checkout 3.3.5
+  git -C ~trinity/TrinityCore fetch --all
+  git -C ~trinity/TrinityCore reset --hard origin/3.3.5
   #git -C ~trinity/TrinityCore pull
   find ~trinity/TrinityCore/sql -iname '*.sql' -exec sed -i 's/ ENGINE=MyISAM/ ENGINE=InnoDB/g; s/ ROW_FORMAT=FIXED//g;' '{}' \;
 

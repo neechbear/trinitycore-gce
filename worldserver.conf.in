@@ -3360,7 +3360,7 @@ AuctionHouseBot.MinTime = 1
 #       Description: Maximum time for the new auction in hours
 #       Default:     72 - (Hours)
 
-AuctionHouseBot.MaxTime = 72
+AuctionHouseBot.MaxTime = 48
 
 #
 #    AuctionHouseBot.Class.CLASS.Allow.Zero = 0
@@ -3422,7 +3422,7 @@ AuctionHouseBot.Bind.No = 1
 AuctionHouseBot.Bind.Pickup = 0
 AuctionHouseBot.Bind.Equip = 1
 AuctionHouseBot.Bind.Use = 1
-AuctionHouseBot.Bind.Quest = 0
+AuctionHouseBot.Bind.Quest = 1
 
 #
 #    AuctionHouseBot.LockBox.Enabled
@@ -3580,12 +3580,12 @@ AuctionHouseBot.Items.Amount.Yellow = 0
 #                    Misc: 5
 #                    Glyph: 3
 
-AuctionHouseBot.Class.Consumable = 8
+AuctionHouseBot.Class.Consumable = 6
 AuctionHouseBot.Class.Container = 4
 AuctionHouseBot.Class.Weapon = 7
-AuctionHouseBot.Class.Gem = 8
+AuctionHouseBot.Class.Gem = 5
 AuctionHouseBot.Class.Armor = 7
-AuctionHouseBot.Class.Reagent = 2
+AuctionHouseBot.Class.Reagent = 1
 AuctionHouseBot.Class.Projectile = 2
 AuctionHouseBot.Class.TradeGood = 10
 AuctionHouseBot.Class.Generic = 1
