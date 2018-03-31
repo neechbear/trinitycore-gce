@@ -146,8 +146,8 @@ main () {
       libbz2-dev libreadline-dev libncurses-dev libboost-all-dev mysql-server p7zip moreutils
     update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
     update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang 100
-    systemctl stop mysqld || :
-    systemctl disable mysqld || :
+    systemctl stop mysql.service || :
+    systemctl disable mysql.service || :
   fi
 
   # Clone source repository.
