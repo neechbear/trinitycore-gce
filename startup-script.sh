@@ -27,8 +27,8 @@ main () {
 
   bucket="$(curl -sSL -H "Metadata-Flavor: Google" \
     "http://metadata.google.internal/computeMetadata/v1/instance/attributes/mapdata-bucket")"
-  if [[ -n "$bucket" ]] && ! grep -q "$bucket" /etc/fstab ; then
-    echo "$bucket $(echo ~trinity) gcsfuse ro,user,uid=trinity,gid=trinity,implicit_dirs,key_file=/opt/trinitycore/mapdata.key" \
+  if [[ -n "$bucket" ]] && ! grep -q "^$bucket" /etc/fstab ; then
+    echo "$bucket $(echo ~trinity)/mapdata-source gcsfuse ro,user,uid=trinity,gid=trinity,implicit_dirs,key_file=$(echo ~trinity)/mapdata.key" \
       >> /etc/fstab
   fi
 
@@ -70,7 +70,7 @@ Group=trinity
 WantedBy=multi-user.target
 EOF
 
-  cat << 'EOF' > /opt/trinitycore/generate-mapdata.sh
+  cat << 'EOF' > ~trinity/generate-mapdata.sh
 #!/usr/bin/env bash
 set -Euo pipefail
 shopt -s extdebug
@@ -122,7 +122,7 @@ main () {
 main "$@"
 EOF
 
-  cat << 'EOF' > /opt/trinitycore/update.sh
+  cat << 'EOF' > ~trinity/update.sh
 #!/usr/bin/env bash
 set -Eexvuo pipefail
 
@@ -204,7 +204,7 @@ main () {
       [[ ! -e ~trinity/server/data-old ]] || rm -Rfv ~trinity/server/data-old
       [[ ! -e ~trinity/server/data ]] || mv ~trinity/server/data{,-old}
       mkdir -pv ~trinity/server/data
-      export PATH="$PATH:/opt/trinitycore/server/bin"
+      export PATH="$PATH:$(echo ~trinity)/server/bin"
       ~trinity/generate-mapdata.sh ~trinity/mapdata-source ~trinity/server/data
       umount ~trinity/mapdata-source
     fi
@@ -220,13 +220,14 @@ main "$@"
 EOF
 
   cat << 'EOF' > /etc/cron.d/refresh-trinitycore
-0 3 * * * root /opt/trinitycore/update.sh 2>&1 | logger -i -p daemon.info -t refresh-trinirycore
+0 3 * * * root ~trinity/update.sh 2>&1 | logger -i -p daemon.info -t refresh-trinirycore
 0 8 * * * root systemctl restart authserver.service 2>&1 | logger -i -p daemon.info -t restart-authserver
 0 8 * * * root systemctl restart authserver.service 2>&1 | logger -i -p daemon.info -t restart-worldserver
+0 0 1 * * root rm -Rf ~trinity/TrinityCore/build/ 2>&1 | logger -i -p daemon.info -t rm-build-trinirycore
 EOF
 
-  chmod 0754 /opt/trinitycore/*.sh
-  /opt/trinitycore/update.sh
+  chmod 0754 ~trinity/*.sh
+  ~trinity/update.sh
   systemctl daemon-reload
   systemctl start authserver.service
   systemctl start worldserver.service
