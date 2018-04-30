@@ -197,7 +197,7 @@ main () {
       | grep -q 'please re-extract the maps'
   then
     if     ! compgen -G ~trinity/"mapdata-source/*/*.MPQ" \
-        && ! mountpoint ~trinity/mapdata-source ]] ; then
+        && ! mountpoint -q ~trinity/mapdata-source ]] ; then
       mount ~trinity/mapdata-source
     fi
     if compgen -G ~trinity/"mapdata-source/*/*.MPQ" ; then
