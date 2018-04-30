@@ -5,7 +5,7 @@ IMAGE_PROJECT := debian-cloud
 
 PROJECT_ID :=
 ZONE := europe-west1-d
-MACHINE_TYPE := n1-standard-2
+MACHINE_TYPE := n1-standard-1
 
 CONF_JSON := serverconf.json
 ifneq ("$(wildcard serverconf-secret.json)","")
