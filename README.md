@@ -29,10 +29,12 @@ See https://nicolaw.uk/gcloud and https://nicolaw.uk/gcp.
 
 ## TODO
 
-* Automation optional creation of SQL instance and storage bucket.
 * Change from Makefile deployment to using Terraform (possibly still wrapped in
   a Makefile).
-* Pre-bake the machine image using Packer.
+* Automate creation of SQL instance and storage bucket.
+* Pre-bake the machine image using Packer? (Probably not).
+* Move startup-script.sh into cloud-config to make use of write_file for
+  better clarity (scripts writing scripts is far from ideal).
 
 ## See Also
 
@@ -41,4 +43,3 @@ See https://nicolaw.uk/gcloud and https://nicolaw.uk/gcp.
 * https://github.com/GoogleCloudPlatform/gcsfuse
 * https://github.com/neechbear/trinitycore-gce
 * https://github.com/neechbear/trinitycore
-
