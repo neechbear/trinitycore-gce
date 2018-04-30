@@ -1,6 +1,4 @@
 *.conf
 *.dist
-serverconf.sh
-*.mk
 *.key
 *secret*
